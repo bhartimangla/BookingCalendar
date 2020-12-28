@@ -46,36 +46,6 @@ class HomeController extends Controller
         echo json_encode($response);
     }
 
-    public function allBookedSlots()
-    {
-        $allBookedDays = [];
-        $allBookedMonths = [];
-        $allBookedSlots = [];
-        $bookingDays = SlotBooking::select('slot_date')->get();
-
-        foreach ($bookingDays as $key => $bookingDay) {
-            array_push($allBookedDays, explode('/', $bookingDay->slot_date)[0]);
-            array_push($allBookedMonths, explode('/', $bookingDay->slot_date)[1]);
-            $slotTimes = [];
-            $slotDayTimes = [];
-            $bookDate = strtotime($bookingDay->slot_date);
-            $slotDayTimes[0] = date('F d, Y', $bookDate);
-            $bookingSlots = SlotBooking::select('slot_time')->Where('slot_date', $bookingDay->slot_date)->get();
-
-            foreach ($bookingSlots as $key => $bookingSlot) {
-                array_push($slotTimes, $bookingSlot->slot_time);
-            }
-
-            $slotDayTimes[1] = $slotTimes;
-            $allBookedSlots[0] = $slotDayTimes;
-        }
-
-        $allBookedSlots[1] = $allBookedDays;
-        $allBookedSlots[2] = $allBookedMonths;
-        $response['allBookedSlots'] = $allBookedSlots;
-        echo json_encode($response);
-    }
-
     public function slotBook(Request $request) {
 
         $validatedData = $request->validate([
