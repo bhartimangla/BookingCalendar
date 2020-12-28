@@ -3,10 +3,10 @@ $('#date_estimated_arrival').click();
 
 $(document).ready(function () {
     $('.chevron.left').hide();
-    var bookedDay = '';
     var bookedTime = '';
     var customerID = '';
     var bookedSlot = '';
+    var bookedDaySlot = '';
 
     $.ajax({
         url: "/all-booked-slots",
@@ -15,7 +15,7 @@ $(document).ready(function () {
         success: function (response) {
             var data = JSON.parse(response);
             bookedSlot = data.allBookedSlots[0];
-            bookedDay = data.allBookedSlots[1];
+            bookedDaySlot = data.allBookedSlots[1];
 
             jQuery.each(data.allBookedSlots, function(index, item) {
                 $("#dropdown option[value='" + item + "']").hide();
@@ -28,15 +28,25 @@ $(document).ready(function () {
 
     var bookedHour = [];
     var currentSelectedDate = '';
+    var bookedDay = [];
 
-    setInterval(function() { 
+    setInterval(function() {
         var dayLinks = $(".day td.link");
         var hourLinks = $(".hour td.link");
         var minuteLinks = $(".minute td.link");
 
         dayLinks.each(function(idx, li) {
             var dayLink = $(li).text();
-
+            jQuery.each(bookedDaySlot, function(index, item) {
+                if (item[0] == $(".day span.link").text()) {
+                    if ($.inArray(item[1], bookedDay) === -1) {
+                        Array.prototype.push.apply(bookedDay, item[1]);
+                    }
+                } else {
+                    bookedDay = [];
+                }
+            });
+            
             if (($.inArray(dayLink, bookedDay) != -1) && ($(li).hasClass('disabled') == false))
             {
                 $(this).css("cssText", "background-color: green !important;");

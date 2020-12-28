@@ -14,21 +14,23 @@ class Controller extends BaseController
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
     public function allBookedSlots() {
-        $allBookedDays = [];
-        $allBookedMonths = [];
         $allBookedSlots = [];
         $allBookedSlots[0] = [];
+        $allBookedSlots[1] = [];
+        $allmonthlySlots = [];
         $bookingDays = SlotBooking::select('slot_date')->get();
 
         foreach ($bookingDays as $key => $bookingDay) {
-            array_push($allBookedDays, explode('/', $bookingDay->slot_date)[0]);
-            array_push($allBookedMonths, explode('/', $bookingDay->slot_date)[1]);
             $slotTimes = [];
+            $slotDays = [];
             $slotDayTimes = [];
+            $slotMonth = [];
             $allSelectSlots = [];
             $bookDate = str_replace('/', '-', $bookingDay->slot_date);
             $bookDate = strtotime($bookDate);
             $slotDayTimes[0] = date("F d, Y", $bookDate);
+            $slotMonth[0] = date("F Y", $bookDate);
+            array_push($slotDays, explode('/', $bookingDay->slot_date)[0]);
             $bookingSlots = SlotBooking::select('slot_time')->Where('slot_date', $bookingDay->slot_date)->get();
 
             foreach ($bookingSlots as $key => $bookingSlot) {
@@ -36,23 +38,43 @@ class Controller extends BaseController
             }
 
             $slotDayTimes[1] = $slotTimes;
+            $slotMonth[1] = $slotDays;
             array_push($allBookedSlots[0], $slotDayTimes);
+            array_push($allmonthlySlots, $slotMonth);
         }
 
-        $allBookedSlots[1] = array_unique($allBookedDays);
-        $allBookedSlots[2] = array_unique($allBookedMonths);
+        $allUniqueMonths = [];
+        foreach ($allmonthlySlots as $key => $monthlySlot) {
+            if (!in_array($monthlySlot[0], $allUniqueMonths)) {
+                array_push($allUniqueMonths, $monthlySlot[0]);
+            }
+        }
+
+        foreach ($allUniqueMonths as $key => $month) {
+            $mergeDays = [];
+            foreach ($allmonthlySlots as $key => $monthlySlot) {
+                if ($monthlySlot[0] == $month) {
+                    array_push($mergeDays, $monthlySlot[1][0]);
+                }
+            }
+            $bookedDates = [];
+            $bookedDates[0] = $month;
+            $bookedDates[1] = array_unique($mergeDays);
+            array_push($allBookedSlots[1], $bookedDates);
+        }
+
         $response['allBookedSlots'] = $allBookedSlots;
         echo json_encode($response);
     }
 
     public function getCustomer(Request $request) {
         $date = date("d/m/Y", strtotime($request->date));
-    	$customerData = SlotBooking::select('id')->where(['slot_date' => $date, 'slot_time' => $request->time])->first();
-    	echo $customerData->id;
+        $customerData = SlotBooking::select('id')->where(['slot_date' => $date, 'slot_time' => $request->time])->first();
+        echo $customerData->id;
     }
 
     public function viewCustomerDetails($id) {
-    	$customerData = SlotBooking::where('id', $id)->first();
-    	return view('customer-details')->with('customerData', $customerData);
+        $customerData = SlotBooking::where('id', $id)->first();
+        return view('customer-details')->with('customerData', $customerData);
     }
 }
