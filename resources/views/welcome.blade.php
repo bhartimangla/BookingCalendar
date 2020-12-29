@@ -22,7 +22,7 @@
             @endif
             <div class="content">
                 <h2>Booking Calendar</h2></br>
-                <h3>Shop Open Timings 11:00 AM to 8:00 PM</h3>
+                <h3>Shop Open Timings 11:00 AM to 9:00 PM</h3>
                <div class="ui calendar" id="date_estimated_arrival"></div>                
             </div>
         </div>

@@ -18,8 +18,8 @@ class Controller extends BaseController
         $allBookedSlots[0] = [];
         $allBookedSlots[1] = [];
         $allmonthlySlots = [];
-        $bookingDays = SlotBooking::select('slot_date')->get();
-
+        $bookingDays = SlotBooking::select('slot_date')->distinct()->get();
+        
         foreach ($bookingDays as $key => $bookingDay) {
             $slotTimes = [];
             $slotDays = [];
@@ -69,12 +69,21 @@ class Controller extends BaseController
 
     public function getCustomer(Request $request) {
         $date = date("d/m/Y", strtotime($request->date));
-        $customerData = SlotBooking::select('id')->where(['slot_date' => $date, 'slot_time' => $request->time])->first();
-        echo $customerData->id;
+    	$customerData = SlotBooking::select('id')->where(['slot_date' => $date, 'slot_time' => $request->time])->first();
+    	echo $customerData->id;
     }
 
     public function viewCustomerDetails($id) {
-        $customerData = SlotBooking::where('id', $id)->first();
-        return view('customer-details')->with('customerData', $customerData);
+    	$customerData = SlotBooking::where('id', $id)->first();
+    	return view('customer-details')->with('customerData', $customerData);
+    }
+
+    public function getBookingSlots(Request $request) {
+        $day = $request->day;
+        $date = date_parse($request->month);
+        $month = $date['month'];
+        $year = $request->year;
+        $customerData = SlotBooking::select('slot_time')->where('slot_date', $day.'/'.$month.'/'.$year)->get();
+        echo $customerData->count();
     }
 }

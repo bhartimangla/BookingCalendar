@@ -21,5 +21,6 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         '/slot-time',
         '/get-customer',
+        '/get-booking-slots'
     ];
 }

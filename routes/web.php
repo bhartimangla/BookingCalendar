@@ -17,6 +17,7 @@ Route::get('/', function () {
 Route::get('/all-booked-slots', 'Controller@allBookedSlots');
 Route::post('/get-customer', 'Controller@getCustomer');
 Route::get('details/{id}', 'Controller@viewCustomerDetails');
+Route::post('/get-booking-slots', 'Controller@getBookingSlots');
 
 Auth::routes();
 

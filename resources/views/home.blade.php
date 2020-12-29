@@ -58,7 +58,8 @@
                                 <option value="4:00 PM" class="form-label input-label">4 PM - 5 PM</option>
                                 <option value="5:00 PM" class="form-label input-label">5 PM - 6 PM</option>
                                 <option value="6:00 PM" class="form-label input-label">6 PM - 7 PM</option>
-                                <option value="7:00 PM" class="form-label input-label">7 PM - 8 PM</option>                            
+                                <option value="7:00 PM" class="form-label input-label">7 PM - 8 PM</option>
+                                <option value="8:00 PM" class="form-label input-label">8 PM - 9 PM</option>                            
                             </select>                          
                         </div>                                               
                         <div class="form-input-group">

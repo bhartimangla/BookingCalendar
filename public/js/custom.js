@@ -40,16 +40,31 @@ $(document).ready(function () {
             jQuery.each(bookedDaySlot, function(index, item) {
                 if (item[0] == $(".day span.link").text()) {
                     if ($.inArray(item[1], bookedDay) === -1) {
-                        Array.prototype.push.apply(bookedDay, item[1]);
+                        if (!!bookedDay) {
+                            Array.prototype.push.apply(bookedDay, item[1]);
+                        }
                     }
                 } else {
                     bookedDay = [];
                 }
             });
             
+            if (!!bookedDay) { 
+                bookedDay = getUniqueCount(bookedDay);
+            }
             if (($.inArray(dayLink, bookedDay) != -1) && ($(li).hasClass('disabled') == false))
             {
-                $(this).css("cssText", "background-color: green !important;");
+                var month = $(".day span.link").text().split(" ")[0];
+                var year = $(".day span.link").text().split(" ")[1];
+                var slotsCount = getBookingCount(dayLink, month, year);
+
+                if (slotsCount == 10) {
+                    $(this).css("cssText", "background-color: red !important;");
+                } else if (slotsCount == 5) {
+                    $(this).css("cssText", "background-color: yellow !important;");
+                } else {
+                    $(this).css("cssText", "background-color: green !important;");                    
+                }
             }
         });
 
@@ -88,6 +103,33 @@ $(document).ready(function () {
 
     }, 1000);
 });
+
+function getUniqueCount(bookedDay) {
+    var unique = bookedDay.filter(function(itm, i, bookedDay) {
+        return i == bookedDay.indexOf(itm);
+    });
+
+    return unique;
+}
+
+function getBookingCount(day, month, year) {
+    var slotsCount = '';
+
+    $.ajax({
+        url: "/get-booking-slots",
+        type: "POST",
+        data: {day: day, month: month, year: year},
+        async: false,
+        success: function (response) {
+            slotsCount = response;
+        },
+        error: function (error) {
+            console.log(error);
+        }
+    });
+
+    return slotsCount;
+}
 
 function getCustomerID(selectDate, selectTime) {
     var name = '';
